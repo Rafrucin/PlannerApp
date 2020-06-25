@@ -10,5 +10,6 @@ namespace PlannerApp.Shared.Models
         public bool IsSuccess { get; set; }
         public string[] Errors { get; set; }
         public DateTime? ExpireDate { get; set; }
+        public Dictionary<string,string> UserInfo { get; set; }
     }
 }

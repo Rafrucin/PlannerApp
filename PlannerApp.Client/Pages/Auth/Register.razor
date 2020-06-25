@@ -2,12 +2,18 @@
 @layout AuthLayout
 @using PlannerApp.Shared.Models
 
+@inject AuthenticationService authService 
+@inject NavigationManager navigation
+
 
 <div class="row">
     <div class="col-12">
         <h2>Create a new account</h2>
+
         <EditForm Model="model" OnValidSubmit="RegisterUser">
             <RadzenCard>
+                <Alertmessage Message="@message" MessageType="@messageType" />
+
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -19,7 +25,7 @@
                 <RadzenTextBox @bind-Value="model.LastName"></RadzenTextBox>
 
                 <label>Email Address</label>
-                <RadzenTextBox @bind-Value="model.EmailAddress"></RadzenTextBox>
+                <RadzenTextBox @bind-Value="model.Email"></RadzenTextBox>
 
                 <label>Password</label>
                 <RadzenPassword @bind-Value="model.Password"></RadzenPassword>
@@ -28,8 +34,10 @@
                 <RadzenPassword @bind-Value="model.ConfirmPassword"></RadzenPassword>
 
                 <hr />
-                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Register" ButtonStyle="Radzen.ButtonStyle.Primary" class="btn-block mr-2" />
-                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Login" ButtonStyle="Radzen.ButtonStyle.Secondary" class="btn-block mr-2" />
+                <RadzenButton ButtonType="Radzen.ButtonType.Submit" Text="Register"
+                              ButtonStyle="Radzen.ButtonStyle.Primary" class="btn-block mr-2" Disabled="isBusy" />
+                <RadzenButton ButtonType="Radzen.ButtonType.Button" Text="Login" 
+                              ButtonStyle="Radzen.ButtonStyle.Secondary" class="btn-block mr-2" Disabled="isBusy" Click="GoToLogin"/>
 
             </RadzenCard>
         </EditForm>
@@ -39,8 +47,33 @@
 @code {
     RegisterRequestModel model = new RegisterRequestModel();
 
-    public void RegisterUser()
-    {
+    bool isBusy = false;
 
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    string message = string.Empty;
+
+    public async Task RegisterUser()
+    {
+        isBusy = true;
+
+        var result = await authService.RegisterUserAsync(model);
+        if (result.IsSuccess)
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Success;
+        }
+        else
+        {
+            message = result.Errors.FirstOrDefault()??result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+
+        isBusy = false;
+    }
+
+    void GoToLogin()
+    {
+        navigation.NavigateTo("/auth/login");
     }
 }

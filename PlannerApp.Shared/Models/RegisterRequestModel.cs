@@ -6,7 +6,12 @@ using System.Text;
 namespace PlannerApp.Shared.Models
 {
     public class RegisterRequestModel
-    {
+    {        
+        [Required]
+        [StringLength(50)]
+        [EmailAddress]
+        public string Email { get; set; }
+
         [Required]
         [StringLength(25)]
         public string FirstName { get; set; }
@@ -15,10 +20,6 @@ namespace PlannerApp.Shared.Models
         [StringLength(25)]
         public string LastName { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [EmailAddress]
-        public string EmailAddress { get; set; }
 
         [Required]
         [StringLength(50)]
