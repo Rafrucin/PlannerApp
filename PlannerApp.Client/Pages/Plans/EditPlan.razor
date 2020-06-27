@@ -34,36 +34,37 @@ else
         <div class="col-6">
             <RadzenCard>
                 <h2>Plan's tasks</h2>
+                <Alertmessage Message="@messageItem" MessageType="Models.AlertMessageType.Error" />
                 <EditForm Model="itemModel" OnValidSubmit="async()=> await submitItemFormAsync()">
-                    <DataAnnotationsValidator/>
-                    <ValidationSummary/>
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
                     <table>
                         <tr>
                             <td>
-                                <RadzenButton Text="*" Click="clearSelection" ButtonStyle="Radzen.ButtonStyle.Info" ButtonType="Radzen.ButtonType.Button" Disabled="IsBusy" class="m-1 btn-sm"/>                                
+                                <RadzenButton Text="*" Click="clearSelection" ButtonStyle="Radzen.ButtonStyle.Info" ButtonType="Radzen.ButtonType.Button" Disabled="IsBusy" class="m-1 btn-sm" />
                             </td>
                             <td>
                                 <RadzenTextBox Placeholder="Item Descriptipn ...." @bind-Value="itemModel.Description" class="m-1" />
                             </td>
                             <td>
-                                <RadzenButton Text="Submit" ButtonStyle="Radzen.ButtonStyle.Primary" ButtonType="Radzen.ButtonType.Submit" Disabled="IsBusy" class="m-1 btn-sm"/>
+                                <RadzenButton Text="Submit" ButtonStyle="Radzen.ButtonStyle.Primary" ButtonType="Radzen.ButtonType.Submit" Disabled="IsBusy" class="m-1 btn-sm" />
                             </td>
                         </tr>
                         @foreach (var item in items)
                         {
                             string descriptionStyle = item.IsDone ? "text-decoration-line: line-through" : "text-decoration-line: none";
                             string rowStyle = selectedItem == item ? "cursor:pointer; background:lightblue" : "cursor:pointer; background:white";
-                    <tr style="@rowStyle" @onclick="()=>selectItem(item)">
-                        <td>
-                            <RadzenCheckBox @bind-Value="item.IsDone" @onclick="async()=> await ChangeItemStatusAsync(item.Id)" class="m-1"/>
-                        </td>
-                        <td>
-                            <span style ="@descriptionStyle" class="m-1">@item.Description</span>
-                        </td>
-                        <td>
-                            <RadzenButton Text="x" ButtonStyle="Radzen.ButtonStyle.Danger" Click="async () =>await RemoveItem(item)" ButtonType="Radzen.ButtonType.Button" Disabled="IsBusy" class="m-1 btn-sm"/>
-                        </td>
-                    </tr>
+                            <tr style="@rowStyle" @onclick="()=>selectItem(item)">
+                                <td>
+                                    <RadzenCheckBox @bind-Value="item.IsDone" @onclick="async()=> await ChangeItemStatusAsync(item.Id)" class="m-1" />
+                                </td>
+                                <td>
+                                    <span style="@descriptionStyle" class="m-1">@item.Description</span>
+                                </td>
+                                <td>
+                                    <RadzenButton Text="x" ButtonStyle="Radzen.ButtonStyle.Danger" Click="async () =>await RemoveItem(item)" ButtonType="Radzen.ButtonType.Button" Disabled="IsBusy" class="m-1 btn-sm" />
+                                </td>
+                            </tr>
                         }
                     </table>
                 </EditForm>
@@ -88,6 +89,7 @@ else
         //Alert
         Models.AlertMessageType messageType = Models.AlertMessageType.Success;
         string message = string.Empty;
+        string messageItem = string.Empty;
 
         ElementReference inputReference;
 
@@ -203,8 +205,7 @@ else
             }
             else
             {
-                //message = result.message;
-                //messageType = Models.AlertMessageType.Error;
+                messageItem = result.message;
             }
 
             IsBusy = false;
@@ -226,8 +227,7 @@ else
             }
             else
             {
-                //message = result.message;
-                //messageType = Models.AlertMessageType.Error;
+                messageItem = result.message;
             }
 
             IsBusy = false;
@@ -252,7 +252,7 @@ else
             var result = await itemService.ChangeItemStateAsync(itemId);
             if (!result.isSuccess)
             {
-                //TODO alert
+                messageItem = result.message;
             }
             IsBusy = false;
         }
@@ -262,6 +262,14 @@ else
             selectedItem = item;
             itemModel.Id = item.Id;
             itemModel.Description = item.Description;
+            if (item.IsDone)
+            {
+                messageItem = "Checked cannot be edited";
+            }
+            else
+            {
+                messageItem = null;
+            }
         }
 
         void clearSelection()
@@ -282,7 +290,7 @@ else
             }
             else
             {
-                //message
+                messageItem = result.message;
             }
 
             IsBusy = false;
