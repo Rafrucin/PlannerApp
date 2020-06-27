@@ -9,7 +9,7 @@
 @code {
     [Parameter] public string Message { get; set; }
 
-    private Models.AlertMessageType messageType;   
+    private Models.AlertMessageType messageType;
 
     [Parameter]
     public Models.AlertMessageType MessageType
@@ -37,6 +37,19 @@
             }
         }
     }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        await PutTaskDelay();
+        HideMessage();
+    }
+
+
+    async Task PutTaskDelay()
+    {
+        await Task.Delay(5000);
+    }
+
 
     string alertClass = "alert-info";
 

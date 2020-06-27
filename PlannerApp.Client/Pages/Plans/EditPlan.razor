@@ -14,7 +14,7 @@ else
     <h2>Edit @model.Title</h2>
 
     <div class="row">
-        <div class="col-6">
+        <div class="col-6 p-1">
             <EditForm Model="model" OnValidSubmit="async () => await EditPlanAsync()">
                 <RadzenCard>
                     <Alertmessage Message="@message" MessageType="@messageType" />
@@ -25,48 +25,47 @@ else
                     <RadzenTextArea Placeholder="Description" class="m-2" @bind-Value="model.Description" />
                     <input type="file" class="m-2" @ref="inputReference" @onchange="async () => await ChooseFileAsync()" />
                     <img style="width:100%; margin:10px" src="@imageContent" />
+                    
                     <hr />
                     <RadzenButton ButtonType="Radzen.ButtonType.Submit" ButtonStyle="Radzen.ButtonStyle.Light" Style="margin:5px" class="btn-block" Disabled="IsBusy" Text="Submit" />
 
                 </RadzenCard>
             </EditForm>
         </div>
-        <div class="col-6">
+        <div class="col-6 p-1">
             <RadzenCard>
                 <h2>Plan's tasks</h2>
                 <Alertmessage Message="@messageItem" MessageType="Models.AlertMessageType.Error" />
                 <EditForm Model="itemModel" OnValidSubmit="async()=> await submitItemFormAsync()">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
-                    <table>
-                        <tr>
-                            <td>
-                                <RadzenButton Text="*" Click="clearSelection" ButtonStyle="Radzen.ButtonStyle.Info" ButtonType="Radzen.ButtonType.Button" Disabled="IsBusy" class="m-1 btn-sm" />
-                            </td>
-                            <td>
-                                <RadzenTextBox Placeholder="Item Descriptipn ...." @bind-Value="itemModel.Description" class="m-1" />
-                            </td>
-                            <td>
-                                <RadzenButton Text="Submit" ButtonStyle="Radzen.ButtonStyle.Primary" ButtonType="Radzen.ButtonType.Submit" Disabled="IsBusy" class="m-1 btn-sm" />
-                            </td>
-                        </tr>
-                        @foreach (var item in items)
-                        {
-                            string descriptionStyle = item.IsDone ? "text-decoration-line: line-through" : "text-decoration-line: none";
-                            string rowStyle = selectedItem == item ? "cursor:pointer; background:lightblue" : "cursor:pointer; background:white";
-                            <tr style="@rowStyle" @onclick="()=>selectItem(item)">
-                                <td>
-                                    <RadzenCheckBox @bind-Value="item.IsDone" @onclick="async()=> await ChangeItemStatusAsync(item.Id)" class="m-1" />
-                                </td>
-                                <td>
-                                    <span style="@descriptionStyle" class="m-1">@item.Description</span>
-                                </td>
-                                <td>
-                                    <RadzenButton Text="x" ButtonStyle="Radzen.ButtonStyle.Danger" Click="async () =>await RemoveItem(item)" ButtonType="Radzen.ButtonType.Button" Disabled="IsBusy" class="m-1 btn-sm" />
-                                </td>
-                            </tr>
-                        }
-                    </table>
+
+                    <div class="input-group m-1">                        
+                            
+                        <InputText @bind-Value="itemModel.Description" class="form-control" Placeholder="Item description..." />                     
+                       
+                        <button class="btn btn-info input-group-append" type="submit" aria-disabled="@IsBusy">Submit</button>
+                     
+                    </div>
+
+                    @foreach (var item in items)
+                    {
+                        string descriptionStyle = item.IsDone ? "text-decoration-line: line-through" : "text-decoration-line: none";
+                        string rowStyle = selectedItem == item ? "cursor:pointer; background:lightblue" : "cursor:pointer; background:white";
+                        <div class="row" style="@rowStyle" @onclick="()=>selectItem(item)">
+                            <div class="col-1">
+                                <RadzenCheckBox @bind-Value="item.IsDone" @onclick="async()=> await ChangeItemStatusAsync(item.Id)" class="m-1" />
+                            </div>
+                            <div class="col-8 text-left">
+                                <span style="@descriptionStyle" class="m-1">@item.Description</span>
+                            </div>
+                            <div class="col-3">
+                                <button type="button" @onclick="async () => await RemoveItem(item)" class="btn btn-sm m-1 btn-danger" aria-disabled="@IsBusy">Remove</button>
+                            </div>
+                        </div>
+
+                    }
+
                 </EditForm>
             </RadzenCard>
         </div>
@@ -208,6 +207,8 @@ else
                 messageItem = result.message;
             }
 
+            clearSelection();
+
             IsBusy = false;
 
         }
@@ -229,6 +230,7 @@ else
             {
                 messageItem = result.message;
             }
+            clearSelection();
 
             IsBusy = false;
 
@@ -259,17 +261,22 @@ else
 
         void selectItem (ToDoItem item)
         {
+            if (item == selectedItem)
+            {
+                clearSelection();
+                return;
+            }
             selectedItem = item;
             itemModel.Id = item.Id;
             itemModel.Description = item.Description;
-            if (item.IsDone)
-            {
-                messageItem = "Checked cannot be edited";
-            }
-            else
-            {
-                messageItem = null;
-            }
+            //if (item.IsDone)
+            //{
+            //    messageItem = "Checked cannot be edited";
+            //}
+            //else
+            //{
+            //    messageItem = null;
+            //}
         }
 
         void clearSelection()
@@ -292,7 +299,7 @@ else
             {
                 messageItem = result.message;
             }
-
+            clearSelection();
             IsBusy = false;
         }
 
