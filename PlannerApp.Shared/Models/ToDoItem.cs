@@ -8,10 +8,10 @@ namespace PlannerApp.Shared.Models
     {
         public string Id { get; set; }
         public string Description { get; set; }
-        public bool isDone { get; set; }
-        public DateTime EstimatedDate { get; set; }
-        public DateTime achievedDate { get; set; }
-        public string planId { get; set; }
+        public bool IsDone { get; set; }
+        public DateTime? EstimatedDate { get; set; }
+        public DateTime? AchievedDate { get; set; }
+        public string PlanId { get; set; }
         
         //public DateTime createdDate { get; set; }
         //public DateTime modifiedDate { get; set; }

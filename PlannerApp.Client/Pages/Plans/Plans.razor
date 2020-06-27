@@ -5,24 +5,31 @@
 @inject NavigationManager navigationManager
 
 
-@if (string.IsNullOrWhiteSpace(Query))
-{
-    <h2>My Plans - Page: @PageNumber</h2>
-}
-else
-{
-    <h2>My Plans - Results for '@Query' - Page: @PageNumber</h2>
-}
-
-
 @if (isBusy)
 {
-    <h2>Loading...</h2>
+    <p><em>Loading...</em></p>
 }
 else
 {
+
+    @if (string.IsNullOrWhiteSpace(Query))
+    {
+        <h2>My Plans</h2> @if (PageNumber>1) { <h2> - Page: @PageNumber</h2>}
+    }
+    else
+    {
+        <h2>My Plans - Results for '@Query' - Page: @PageNumber</h2>
+    }
+
+
+    @if (isBusy)
+    {
+        <h2>Loading...</h2>
+    }
+    else
+    {
     <div class="row">
-        <RadzenTextBox Placeholder="Search query" @bind-Value="Query" class="m-2"/><RadzenButton class="m-2" Text="Search" Click="async()=> await GetPlansAsync()" />
+        <RadzenTextBox Placeholder="Search query" @bind-Value="Query" class="m-2" /><RadzenButton class="m-2" Text="Search" Click="async () => await GetPlansAsync()" />
     </div>
     <hr />
     <div class="row">
@@ -37,16 +44,16 @@ else
                     <hr />
                     <div class="row">
                         <div class="col-6">
-                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Edit" Click='()=>navigationManager.NavigateTo($"/plans/details/{plan.Id}")' class="btn-block" />
+                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Success" Text="Edit" Click='() => navigationManager.NavigateTo($"/plans/details/{plan.Id}")' class="btn-block" />
                         </div>
                         <div class="col-6">
-                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Text="Delete" class="btn-block" Click="()=>SelectPlan(plan.Id)" />
+                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Text="Delete" class="btn-block" Click="() => SelectPlan(plan.Id)" />
                         </div>
                     </div>
                     @if (selectedPlanId == plan.Id)
                     {
                         <div class="row">
-                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Confirm delete" class="btn-block m-2" Click="async()=> await DeletePlan()"/>
+                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Text="Confirm delete" class="btn-block m-2" Click="async () => await DeletePlan()" />
                         </div>
                     }
 
@@ -71,7 +78,7 @@ else
         }
     </div>
 }
-
+}
 @code
 {
     [Parameter]
@@ -83,7 +90,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    bool isBusy = false;
+    bool isBusy = true;
 
     List<Plan> plans = new List<Plan>();
 
@@ -112,6 +119,8 @@ else
             result = await plansService.SearchPlansByPageAsync(Query, PageNumber.Value);
         }
 
+        
+
         totalPages = (result.count % result.pageSize) == 0 ? (result.count / result.pageSize) : (result.count / result.pageSize) + 1;
 
         plans = result.Records.ToList();
@@ -128,6 +137,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await GetPlansAsync();
+        isBusy = false;
     }
 
     string selectedPlanId = string.Empty;
